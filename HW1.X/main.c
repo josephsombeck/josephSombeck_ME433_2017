@@ -36,7 +36,7 @@
 #pragma config FUSBIDIO = ON // USB pins controlled by USB module
 #pragma config FVBUSONIO = ON // USB BUSON controlled by USB module
 
-
+ 
 int main() {
 
     __builtin_disable_interrupts();
@@ -54,11 +54,24 @@ int main() {
     DDPCONbits.JTAGEN = 0;
 
     // do your TRIS and LAT commands here
-
+    TRISAbits.TRISA4 = 0;
+    TRISBbits.TRISB4 = 1;
+    
     __builtin_enable_interrupts();
-
+    int flag = 1;
     while(1) {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		  // remember the core timer runs at half the CPU speed
+        LATAbits.LATA4 = flag;
+        if(flag == 1) {
+            flag = 0;
+        }
+        else {
+            flag = 1;
+        }
+        _CP0_SET_COUNT(0);
+        int count = 0;
+        while(_CP0_GET_COUNT() < 500000){}; // wait
+        
     }
 }
