@@ -23,10 +23,10 @@
 #pragma config FWDTWINSZ = WINSZ_25 // wdt window at 25%
 
 // DEVCFG2 - get the CPU clock to 48MHz
-#pragma config FPLLIDIV = DIV_10 // divide input clock to be in range 4-5MHz
-#pragma config FPLLMUL = MUL_20 // multiply clock after FPLLIDIV
+#pragma config FPLLIDIV = DIV_2 // divide input clock to be in range 4-5MHz
+#pragma config FPLLMUL = MUL_24 // multiply clock after FPLLIDIV
 #pragma config FPLLODIV = DIV_2 // divide clock after FPLLMUL to get 48MHz
-#pragma config UPLLIDIV = DIV_6 // divider for the 8MHz input clock, then multiply by 12 to get 48MHz for USB
+#pragma config UPLLIDIV = DIV_2 // divider for the 8MHz input clock, then multiply by 12 to get 48MHz for USB
 #pragma config UPLLEN = ON // USB clock on
 
 // DEVCFG3
@@ -59,19 +59,22 @@ int main() {
     
     __builtin_enable_interrupts();
     int flag = 1;
+    const int BLINK_COUNT = 24000;
+    _CP0_SET_COUNT(0);
     while(1) {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
-		  // remember the core timer runs at half the CPU speed
-        LATAbits.LATA4 = flag;
-        if(flag == 1) {
-            flag = 0;
+        // remember the core timer runs at half the CPU speed
+        // running at 48MHz, so 24MHz counter, want 1KHz blinking, so we need
+        // to count for 24000. divide by 2 because this is half the period
+        while(PORTBbits.RB4 == 0) {}; // pause program until unpushed
+        
+        if(_CP0_GET_COUNT() >= BLINK_COUNT/2)
+        {
+            _CP0_SET_COUNT(0);
+            flag = ~flag;
+            LATAbits.LATA4 = flag;
+
         }
-        else {
-            flag = 1;
-        }
-        _CP0_SET_COUNT(0);
-        int count = 0;
-        while(_CP0_GET_COUNT() < 500000){}; // wait
         
     }
 }
