@@ -14683,7 +14683,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <part name="U$3" library="PIC32" deviceset="28PIN_DIP" device=""/>
 <part name="U$4" library="slide_switch" deviceset="SLIDE_SWITCH" device=""/>
 <part name="P+2" library="supply1" deviceset="+5V" device=""/>
-<part name="GND15" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -14738,7 +14737,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <instance part="U$3" gate="G$1" x="53.34" y="35.56"/>
 <instance part="U$4" gate="G$1" x="50.8" y="-48.26" rot="R180"/>
 <instance part="P+2" gate="1" x="50.8" y="-33.02"/>
-<instance part="GND15" gate="1" x="43.18" y="-33.02" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -14830,11 +14828,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <pinref part="PICKIT" gate="G$1" pin="3"/>
 <pinref part="GND14" gate="1" pin="GND"/>
 <wire x1="-20.32" y1="53.34" x2="-10.16" y2="53.34" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="U$4" gate="G$1" pin="P$3"/>
-<pinref part="GND15" gate="1" pin="GND"/>
-<wire x1="43.18" y1="-43.18" x2="43.18" y2="-35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$1" class="0">
