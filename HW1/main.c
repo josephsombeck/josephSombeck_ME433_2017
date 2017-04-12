@@ -58,7 +58,8 @@ int main() {
     TRISBbits.TRISB4 = 1;
     
     __builtin_enable_interrupts();
-    int flag = 1;
+    int flag = 1;            
+    LATAbits.LATA4 = flag;
     const int BLINK_COUNT = 24000;
     _CP0_SET_COUNT(0);
     while(1) {
@@ -71,7 +72,7 @@ int main() {
         if(_CP0_GET_COUNT() >= BLINK_COUNT/2)
         {
             _CP0_SET_COUNT(0);
-            flag = ~flag;
+            //flag = ~flag;
             LATAbits.LATA4 = flag;
 
         }
