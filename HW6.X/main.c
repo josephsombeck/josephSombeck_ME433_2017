@@ -126,19 +126,20 @@ int main() {
     int counterDisp = 0;
     _CP0_SET_COUNT(0);
     while(1) {  
-        if(_CP0_GET_COUNT() > 300000*4){
-            if(counterDisp > 100)
-            {
-                sprintf(message,"Hello world %d",counterDisp);
-                display_message(message,28,32,BLACK,BLACK);
-                counterDisp = 0;
-            }
+        if(counterDisp > 100)
+        {
             sprintf(message,"Hello world %d",counterDisp);
-            display_message(message,28,32,WHITE,BLACK);
-            display_bar(14, 50, 10, counterDisp, 100, WHITE,BLACK);
-            counterDisp = counterDisp+1;
-            
-            _CP0_SET_COUNT(0);
+            display_message(message,28,32,BLACK,BLACK);
+            counterDisp = 0;
         }
+        sprintf(message,"Hello world %d",counterDisp);
+        display_message(message,28,32,WHITE,BLACK);
+        display_bar(14, 50, 10, counterDisp, 100, WHITE,BLACK);
+        counterDisp = counterDisp+1;
+
+        float fps = 1.0/(_CP0_GET_COUNT()/24000000.0);
+        sprintf(message,"FPS: %.2f",fps);
+        display_message(message,28,72,WHITE,BLACK);
+        _CP0_SET_COUNT(0);
     }
 }
