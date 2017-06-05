@@ -331,6 +331,30 @@ void APP_Initialize(void) {
     appData.sofEventHasOccurred = false;
     //appData.isSwitchPressed = false;
 
+    // put these initializations in APP_Initialize()
+    RPA0Rbits.RPA0R = 0b0101; // A0 is OC1
+    TRISAbits.TRISA1 = 0;
+    LATAbits.LATA1 = 0; // A1 is the direction pin to go along with OC1
+
+    RPB3Rbits.RPB3R = 0b0101; // B2 is OC4
+    TRISBbits.TRISB2 = 0;
+    LATBbits.LATB2 = 0; // B3 is the direction pin to go along with OC4
+    
+    // also put these in APP_Initialize()
+    T2CONbits.TCKPS = 2; // prescaler N=4 
+    PR2 = 1200 - 1; // 10kHz
+    TMR2 = 0;
+    OC1CONbits.OCM = 0b110; // PWM mode without fault pin; other OC1CON bits are defaults
+    OC4CONbits.OCM = 0b110;
+    OC1RS = 0; // max allowed value is 1119
+    OC1R = 0; // read-only initial value
+    OC4RS = 0; // max allowed value is 1119
+    OC4R = 0; // read-only initial value
+    T2CONbits.ON = 1;
+    OC1CONbits.ON = 1;
+    OC4CONbits.ON = 1;
+    
+    
     /* Set up the read buffer */
     appData.readBuffer = &readBuffer[0];
 
@@ -383,7 +407,8 @@ void APP_Tasks(void) {
 
             /* If a read is complete, then schedule a read
              * else wait for the current read to complete */
-
+            
+                
             appData.state = APP_STATE_WAIT_FOR_READ_COMPLETE;
             if (appData.isReadComplete == true) {
                 appData.isReadComplete = false;
@@ -450,11 +475,27 @@ void APP_Tasks(void) {
                         &appData.writeTransferHandle,
                         dataOut, len,
                         USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);
+                
+                int maxVal = 800;
+                int minVal = 200;
+                
+                LATAbits.LATA1 = 1; // direction
+                OC1RS = 500 + rxVal; // velocity, 50%
+                LATBbits.LATB2 = 1; // direction
+                OC4RS = 500 + rxVal; // velocity, 50%
+ 
+                // 1000 is near max?
+                // 600 -- 50%?
+                // 400 -- 15%?
+                // 350 -- 10%
+                // 300 -- 5%
+                // 200 -- 1%
+                
                 rxPos = 0;
                 gotRx = 0;
             } else {
                 len = sprintf(dataOut, "%d\r\n", i);
-                i++;
+                i;
                 USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
                         &appData.writeTransferHandle, dataOut, len,
                         USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);

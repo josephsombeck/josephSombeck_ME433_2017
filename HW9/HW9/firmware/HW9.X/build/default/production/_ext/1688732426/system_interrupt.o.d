@@ -223,5 +223,5 @@ build/default/production/_ext/1688732426/system_interrupt.o:  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/osal/src/osal_impl_basic.h  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/usb/usb_device_cdc.h  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/usb/usb_cdc.h  \
- ../src/../HW9.X/i2c_master_noint.c  \
+ ../src/../HW9.X/i2c_master_noint.h  \
  ../src/system_config/default/system_definitions.h 

@@ -70,5 +70,4 @@ build/default/production/_ext/822048611/sys_ports_static.o:  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/peripheral/int/processor/../templates/int_EnableControl_PIC32.h  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/peripheral/int/processor/../templates/int_ShadowRegisterAssign_Unsupported.h  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/peripheral/int/processor/../templates/int_VariableOffset_Unsupported.h  \
- ../../../../../../../../../../../microchip/harmony/v1_10/framework/peripheral/int/processor/../templates/int_SoftwareNMI_Unsupported.h  \
-
+ ../../../../../../../../../../../microchip/harmony/v1_10/framework/peripheral/int/processor/../templates/int_SoftwareNMI_Unsupported.h 

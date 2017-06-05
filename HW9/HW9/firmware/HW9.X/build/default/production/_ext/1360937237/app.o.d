@@ -224,4 +224,4 @@ build/default/production/_ext/1360937237/app.o:  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/usb/usb_device_cdc.h  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/usb/usb_cdc.h  \
  ../src/app.h  \
-../src/../HW9.X/i2c_master_noint.c 
+../src/../HW9.X/i2c_master_noint.h 

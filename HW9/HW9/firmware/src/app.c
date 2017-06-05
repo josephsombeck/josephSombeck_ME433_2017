@@ -61,17 +61,26 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 uint8_t APP_MAKE_BUFFER_DMA_READY dataOut[APP_READ_BUFFER_SIZE];
 uint8_t APP_MAKE_BUFFER_DMA_READY readBuffer[APP_READ_BUFFER_SIZE];
 int len, i = 0;
+int printMax = 100;
 int startTime = 0;
 unsigned char dataRaw[14];
 unsigned char *dataRawPointer;
+
 int lengthDataRaw = 14;
-short temperature = 0;
-short gyroX = 0;
-short gyroY = 0;
-short gyroZ = 0;
-short accelX = 0;
-short accelY = 0;
-short accelZ = 0;
+double lengthMAFBuffer = 8.0;
+int idxMAFBuffer = 0;
+short accelZ_raw = 0;
+short accelZ_maf = 0;
+short mafBuffer[10];
+short accelZ_iir = 0;
+short accelZ_iir_oldAverage = 0;
+double alpha_iir = 0.8; // previous
+double beta_iir = 0.2; // new
+short accelZ_fir = 0;
+short firBuffer[10];
+double firCoeffs[10] = {0.01,0.01,0.05,0.12,0.2,0.23,0.2,0.12,0.05,0.01,0.01};
+int lengthFIRBuffer = 10;
+int idxFIRBuffer = 0;
 // *****************************************************************************
 /* Application Data
   Summary:
@@ -390,9 +399,13 @@ void APP_Initialize(void) {
     ANSELBbits.ANSB3 = 0;
     i2c_master_setup();
     initIMU();
-    i=100;
+    i=printMax;
     dataRawPointer = dataRaw;
-
+    int idx;
+    idxMAFBuffer = 0;
+    for(idx = 0; idx < lengthMAFBuffer; idx++){
+        mafBuffer[idx] = 0;
+    }
     startTime = _CP0_GET_COUNT();
 }
 
@@ -494,17 +507,49 @@ void APP_Tasks(void) {
             
             //len = sprintf(dataOut, "%d\r\n", i);
 
-            if(i<100){
+            if(i<printMax){
                 I2C_read_multiple(IMUaddress, OUT_TEMP_L, dataRawPointer, lengthDataRaw);
 
-                temperature = (dataRaw[1]<<8 | dataRaw[0]);
-                gyroX = (dataRaw[3]<<8 | dataRaw[2]);
-                gyroY = (dataRaw[5]<<8 | dataRaw[4]);
-                gyroZ = (dataRaw[7]<<8 | dataRaw[6]);
-                accelX = (dataRaw[9]<<8 | dataRaw[8]);
-                accelY = (dataRaw[11]<<8 | dataRaw[10]);
-                accelZ = (dataRaw[13]<<8 | dataRaw[12]);
-                len = sprintf(dataOut, "%d %d %d %d %d %d\r\n", accelX,accelY,accelZ,gyroX,gyroY,gyroZ);
+                short accelX_raw = (dataRaw[9]<<8 | dataRaw[8]);
+                short accelY_raw = (dataRaw[11]<<8 | dataRaw[10]);
+                accelZ_raw = (dataRaw[13]<<8 | dataRaw[12]);
+                
+                // moving average filter -- mafBuffer, lenMAFBuffer, idxMAFBuffer
+                mafBuffer[idxMAFBuffer] = accelZ_raw;
+                idxMAFBuffer++;
+                if(idxMAFBuffer == lengthMAFBuffer){
+                    idxMAFBuffer = 0;
+                }
+                    
+                accelZ_maf = 0;
+                int idx;
+                for(idx = 0; idx<lengthMAFBuffer;idx++)
+                {
+                    accelZ_maf = accelZ_maf + mafBuffer[idx]/lengthMAFBuffer;
+                }
+                
+                // IIR filter
+                accelZ_iir = alpha_iir*accelZ_iir_oldAverage + beta_iir*accelZ_raw;
+                accelZ_iir_oldAverage = accelZ_iir;
+                // FIR filter
+                
+                accelZ_fir = 0;
+                firBuffer[idxFIRBuffer] = accelZ_raw;
+                int idxFIRBuffer_temp = idxFIRBuffer;
+                for(idx = 0; idx<lengthFIRBuffer; idx++){
+                    accelZ_fir = accelZ_fir + firBuffer[idxFIRBuffer_temp]*firCoeffs[idx];
+                    idxFIRBuffer_temp++;
+                    if(idxFIRBuffer_temp == lengthFIRBuffer){
+                        idxFIRBuffer_temp = 0;
+                    }
+                }
+                idxFIRBuffer++;
+                if(idxFIRBuffer == lengthFIRBuffer){
+                    idxFIRBuffer = 0;
+                }
+                
+                // store for printing
+                len = sprintf(dataOut, "%i %d %d %d %d\r\n",i,accelX_raw, (int8_t)(accelX_raw/500),accelY_raw,(int8_t) (accelY_raw/500));
                 
             }
              
@@ -513,7 +558,7 @@ void APP_Tasks(void) {
                         &appData.writeTransferHandle,
                         appData.readBuffer, 1,
                         USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);*/
-            if(i<100){
+            if(i<printMax){
                 USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
                         &appData.writeTransferHandle, dataOut, len,
                         USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);
@@ -523,7 +568,7 @@ void APP_Tasks(void) {
                 break;
                
             }
-            else if(i==100&& appData.readBuffer[0] == 'r'){
+            else if(i==printMax&& appData.readBuffer[0] == 'r'){
                 appData.readBuffer[0] = 't';
                 i=0;
                 len = 1;

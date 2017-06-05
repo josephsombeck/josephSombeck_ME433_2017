@@ -19,11 +19,12 @@ import android.widget.TextView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import java.io.IOException;
-
+import java.lang.Math;
 import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
 import static android.graphics.Color.rgb;
+import static java.lang.Math.abs;
 
 public class MainActivity extends Activity implements TextureView.SurfaceTextureListener {
     private Camera mCamera;
@@ -121,18 +122,33 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         final Canvas c = mSurfaceHolder.lockCanvas();
         if (c != null) {
             int[] pixels = new int[bmp.getWidth()]; // pixels[] is the RGBA data
-            for(int startY = 0; startY < 480; startY=startY+20) {
+            float[] points = new float[2];
+            for(int idx = 0; idx < 2; idx=idx+1) {
+                int startY = (idx)*80 + 100;
                 // in the row, see if there is more green than red
                 bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
+                float centerOfMass = 0f;
+                float totalMass = 0f;
                 for (int i = 0; i < bmp.getWidth(); i++) {
-                    if ((green(pixels[i]) > thresh + red(pixels[i])) && (green(pixels[i]) > thresh + blue(pixels[i]))) {
+                    if (abs(green(pixels[i])-red(pixels[i])) < thresh && abs(red(pixels[i])-blue(pixels[i])) < thresh && abs(blue(pixels[i]) - green(pixels[i])) < thresh) {
                         pixels[i] = rgb(0, 255, 0); // over write the pixel with pure green
                     }
+                    else{
+                        pixels[i] = rgb(0,0,0);
+                    }
+                    centerOfMass=centerOfMass+green(pixels[i])*i;
+                    totalMass = totalMass+green(pixels[i]);
+
                 }
 
                 // update the row
                 bmp.setPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
+                // draw a circle at some position
+                points[idx] = centerOfMass/totalMass;
+                canvas.drawCircle(points[idx], startY, 5, paint1); // x position, y position, diameter, color
+
             }
+            canvas.drawLine(points[0],100,points[1],180,paint1);
         }
 
         // draw a circle at some position

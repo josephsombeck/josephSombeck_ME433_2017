@@ -41,5 +41,4 @@ build/default/production/_ext/2137702699/usb_device.o:  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/osal/osal.h  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/osal/osal_definitions.h  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/osal/src/osal_impl_basic.h  \
- ../../../../../../../../../../../microchip/harmony/v1_10/framework/system/debug/sys_debug.h  \
-
+ ../../../../../../../../../../../microchip/harmony/v1_10/framework/system/debug/sys_debug.h 

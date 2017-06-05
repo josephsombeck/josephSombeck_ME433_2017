@@ -188,5 +188,4 @@ build/default/production/_ext/192061288/drv_usbfs.o:  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/osal/osal.h  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/osal/osal_definitions.h  \
  ../../../../../../../../../../../microchip/harmony/v1_10/framework/osal/src/osal_impl_basic.h  \
- ../../../../../../../../../../../microchip/harmony/v1_10/framework/system/devcon/sys_devcon.h  \
-
+ ../../../../../../../../../../../microchip/harmony/v1_10/framework/system/devcon/sys_devcon.h 
